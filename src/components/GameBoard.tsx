@@ -55,6 +55,12 @@ interface VisualEffect {
   startTime: number;
 }
 
+// Touch start position for swipe detection
+interface TouchPosition {
+  x: number;
+  y: number;
+}
+
 const GameBoard: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [maze, setMaze] = useState<Cell[][]>([]);
@@ -81,6 +87,13 @@ const GameBoard: React.FC = () => {
   );
   const [ghostsEaten, setGhostsEaten] = useState(0);
   const [visualEffects, setVisualEffects] = useState<VisualEffect[]>([]);
+  const [touchStartPos, setTouchStartPos] = useState<TouchPosition | null>(
+    null
+  );
+  const [currentTouchPos, setCurrentTouchPos] = useState<TouchPosition | null>(
+    null
+  );
+  const [activeTouchId, setActiveTouchId] = useState<number | null>(null);
 
   // Use the sound utility hook
   const { playSound, toggleSounds, soundsEnabled } = useSounds();
@@ -100,6 +113,9 @@ const GameBoard: React.FC = () => {
 
   // Power mode duration in milliseconds
   const POWER_MODE_DURATION = 8000;
+
+  // Minimum drag distance (in pixels) to register as a direction change
+  const MIN_DRAG_DISTANCE = 10;
 
   // Add a visual effect
   const addVisualEffect = (
@@ -400,6 +416,161 @@ const GameBoard: React.FC = () => {
     toggleSounds,
     resetGame,
     soundsEnabled,
+  ]);
+
+  // Process touch movement based on drag direction
+  const processTouchMovement = useCallback(() => {
+    if (!touchStartPos || !currentTouchPos || gameState !== "playing") return;
+
+    const deltaX = currentTouchPos.x - touchStartPos.x;
+    const deltaY = currentTouchPos.y - touchStartPos.y;
+
+    // Only process if the drag distance is significant
+    if (
+      Math.abs(deltaX) < MIN_DRAG_DISTANCE &&
+      Math.abs(deltaY) < MIN_DRAG_DISTANCE
+    ) {
+      return;
+    }
+
+    // Determine the direction of the drag
+    let direction: Direction = "none";
+
+    // Check if the drag was more horizontal or vertical
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      // Horizontal drag
+      direction = deltaX > 0 ? "right" : "left";
+    } else {
+      // Vertical drag
+      direction = deltaY > 0 ? "down" : "up";
+    }
+
+    // Only set next direction if Pacman isn't currently moving
+    // or if we're setting a direction opposite to the current one
+    if (
+      !pacman.isMoving ||
+      (direction === "up" && pacman.direction === "down") ||
+      (direction === "down" && pacman.direction === "up") ||
+      (direction === "left" && pacman.direction === "right") ||
+      (direction === "right" && pacman.direction === "left")
+    ) {
+      setPacman((prev) => ({ ...prev, nextDirection: direction }));
+    }
+
+    // Update touch start position to current position for continuous tracking
+    setTouchStartPos(currentTouchPos);
+  }, [
+    currentTouchPos,
+    gameState,
+    pacman.direction,
+    pacman.isMoving,
+    touchStartPos,
+  ]);
+
+  // Handle touch events for mobile play with drag-based movement
+  useEffect(() => {
+    const handleTouchStart = (e: TouchEvent) => {
+      console.log("TOUCH START");
+
+      if (e.touches.length === 1) {
+        // Store the starting position of the touch
+        const touch = e.touches[0];
+        setActiveTouchId(touch.identifier);
+        setTouchStartPos({
+          x: touch.clientX,
+          y: touch.clientY,
+        });
+        setCurrentTouchPos({
+          x: touch.clientX,
+          y: touch.clientY,
+        });
+
+        // Handle game state changes on touch start
+        if (gameState === "ready" || gameState === "paused") {
+          setGameState("playing");
+          playSound("start");
+
+          if (!ghostModeTimerRef.current) {
+            ghostModeTimerRef.current = setInterval(() => {
+              setGhosts((prevGhosts) =>
+                prevGhosts.map((ghost) => ({
+                  ...ghost,
+                  mode: ghost.mode === "chase" ? "scatter" : "chase",
+                }))
+              );
+            }, 20000);
+          }
+        } else if (gameState === "game-over") {
+          resetGame();
+        }
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      // Prevent scrolling when dragging
+      e.preventDefault();
+
+      console.log("TOUCH MOVE");
+
+      // Find the active touch
+      if (activeTouchId !== null) {
+        for (let i = 0; i < e.touches.length; i++) {
+          const touch = e.touches[i];
+          if (touch.identifier === activeTouchId) {
+            // Update current touch position
+            setCurrentTouchPos({
+              x: touch.clientX,
+              y: touch.clientY,
+            });
+
+            // Process movement based on drag direction
+            processTouchMovement();
+            break;
+          }
+        }
+      }
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      // Check if the active touch has ended
+      let activeEnded = true;
+      for (let i = 0; i < e.touches.length; i++) {
+        if (e.touches[i].identifier === activeTouchId) {
+          activeEnded = false;
+          break;
+        }
+      }
+
+      if (activeEnded) {
+        setActiveTouchId(null);
+        setTouchStartPos(null);
+        setCurrentTouchPos(null);
+      }
+    };
+
+    // Add touch event listeners
+    window.addEventListener("touchstart", handleTouchStart);
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+    window.addEventListener("touchend", handleTouchEnd);
+    window.addEventListener("touchcancel", handleTouchEnd);
+
+    return () => {
+      // Remove touch event listeners
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener("touchcancel", handleTouchEnd);
+    };
+  }, [
+    touchStartPos,
+    currentTouchPos,
+    activeTouchId,
+    gameState,
+    pacman.isMoving,
+    pacman.direction,
+    playSound,
+    processTouchMovement,
+    resetGame,
   ]);
 
   // Advance to next level
