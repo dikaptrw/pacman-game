@@ -77,7 +77,7 @@ const GameBoard: React.FC = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [, setPowerMode] = useState(false);
   const [powerModeTimer, setPowerModeTimer] = useState<NodeJS.Timeout | null>(
-    null,
+    null
   );
   const [ghostsEaten, setGhostsEaten] = useState(0);
   const [visualEffects, setVisualEffects] = useState<VisualEffect[]>([]);
@@ -105,7 +105,7 @@ const GameBoard: React.FC = () => {
   const addVisualEffect = (
     type: "score" | "ghost" | "powerPellet" | "death",
     position: GridPosition,
-    value?: number,
+    value?: number
   ) => {
     const newEffect: VisualEffect = {
       type,
@@ -310,7 +310,7 @@ const GameBoard: React.FC = () => {
                 prevGhosts.map((ghost) => ({
                   ...ghost,
                   mode: ghost.mode === "chase" ? "scatter" : "chase",
-                })),
+                }))
               );
             }, 20000); // Switch every 20 seconds
           }
@@ -585,7 +585,7 @@ const GameBoard: React.FC = () => {
                 ...ghost,
                 mode: "frightened",
                 speed: FRIGHTENED_GHOST_MOVE_TIME,
-              })),
+              }))
             );
 
             // Clear existing power mode timer
@@ -625,7 +625,7 @@ const GameBoard: React.FC = () => {
                     mode: "chase",
                     speed: baseSpeed * levelSpeedMultiplier,
                   };
-                }),
+                })
               );
             }, POWER_MODE_DURATION);
 
@@ -663,7 +663,7 @@ const GameBoard: React.FC = () => {
             ghost.position,
             pacman.position,
             pacman.direction,
-            ghost.mode,
+            ghost.mode
           );
 
           // Determine possible directions (excluding the opposite of current direction)
@@ -725,7 +725,7 @@ const GameBoard: React.FC = () => {
 
                 const distanceToTarget = Math.sqrt(
                   Math.pow(newCol - target.col, 2) +
-                    Math.pow(newRow - target.row, 2),
+                    Math.pow(newRow - target.row, 2)
                 );
 
                 if (distanceToTarget < bestDistance) {
@@ -835,8 +835,8 @@ const GameBoard: React.FC = () => {
                     moveProgress: 0,
                     speed: GHOST_MOVE_TIME * (1 - level * 0.05),
                   }
-                : g,
-            ),
+                : g
+            )
           );
         } else {
           // Pacman loses a life
@@ -886,7 +886,7 @@ const GameBoard: React.FC = () => {
                       moveProgress: 0,
                       mode: "scatter",
                     };
-                  }),
+                  })
                 );
 
                 setGameState("ready");
@@ -924,7 +924,7 @@ const GameBoard: React.FC = () => {
   // Helper function to check if Pacman and ghost are moving between the same cells
   const areMovingBetweenSameCells = (
     pacman: Pacman,
-    ghost: GridGhost,
+    ghost: GridGhost
   ): boolean => {
     // Calculate the target position for Pacman
     let pacmanTargetRow = pacman.position.row;
@@ -1071,7 +1071,7 @@ const GameBoard: React.FC = () => {
               yPos + CELL_SIZE / 2,
               2,
               0,
-              Math.PI * 2,
+              Math.PI * 2
             );
             ctx.fill();
             break;
@@ -1085,7 +1085,7 @@ const GameBoard: React.FC = () => {
               yPos + CELL_SIZE / 2,
               pulseSize,
               0,
-              Math.PI * 2,
+              Math.PI * 2
             );
             ctx.fill();
             break;
@@ -1285,7 +1285,7 @@ const GameBoard: React.FC = () => {
           ghostY + radius - 2 + pupilOffsetY,
           1,
           0,
-          Math.PI * 2,
+          Math.PI * 2
         );
         ctx.fill();
 
@@ -1296,7 +1296,7 @@ const GameBoard: React.FC = () => {
           ghostY + radius - 2 + pupilOffsetY,
           1,
           0,
-          Math.PI * 2,
+          Math.PI * 2
         );
         ctx.fill();
       } else {
@@ -1332,7 +1332,7 @@ const GameBoard: React.FC = () => {
           ctx.fillText(
             `${effect.value}`,
             effectX + CELL_SIZE / 2,
-            effectY - 5 * progress,
+            effectY - 5 * progress
           );
           break;
         case "ghost":
@@ -1342,7 +1342,7 @@ const GameBoard: React.FC = () => {
           ctx.fillText(
             `${effect.value}`,
             effectX + CELL_SIZE / 2,
-            effectY - 10 * progress,
+            effectY - 10 * progress
           );
           break;
         case "powerPellet":
@@ -1354,7 +1354,7 @@ const GameBoard: React.FC = () => {
             effectY + CELL_SIZE / 2,
             radius,
             0,
-            Math.PI * 2,
+            Math.PI * 2
           );
           ctx.fill();
           break;
@@ -1367,7 +1367,7 @@ const GameBoard: React.FC = () => {
             effectY + CELL_SIZE / 2,
             deathRadius,
             0,
-            Math.PI * 2,
+            Math.PI * 2
           );
           ctx.fill();
           break;
@@ -1384,7 +1384,7 @@ const GameBoard: React.FC = () => {
       ctx.fillText(
         "Press SPACE to start",
         canvas.width / 2,
-        canvas.height / 2 + 24,
+        canvas.height / 2 + 24
       );
     } else if (gameState === "paused") {
       ctx.fillStyle = "yellow";
@@ -1392,7 +1392,7 @@ const GameBoard: React.FC = () => {
       ctx.fillText(
         "Press SPACE to resume",
         canvas.width / 2,
-        canvas.height / 2 + 24,
+        canvas.height / 2 + 24
       );
     } else if (gameState === "game-over") {
       ctx.fillStyle = "red";
@@ -1401,7 +1401,7 @@ const GameBoard: React.FC = () => {
       ctx.fillText(
         "Press SPACE to play again",
         canvas.width / 2,
-        canvas.height / 2 + 24,
+        canvas.height / 2 + 24
       );
     } else if (gameState === "win") {
       ctx.fillStyle = "yellow";
@@ -1409,7 +1409,7 @@ const GameBoard: React.FC = () => {
       ctx.fillText(
         "Get ready for level " + (level + 1),
         canvas.width / 2,
-        canvas.height / 2 + 24,
+        canvas.height / 2 + 24
       );
     }
 
@@ -1438,7 +1438,7 @@ const GameBoard: React.FC = () => {
 
       <canvas
         ref={canvasRef}
-        className="border-2 border-blue-600 shadow-lg shadow-blue-500/50"
+        className="border-2 border-white"
         width={448}
         height={496}
       />
