@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React, { useEffect } from 'react';
-import GameBoard from '@/components/GameBoard';
-import Link from 'next/link';
+import React, { useEffect } from "react";
+import GameBoard from "@/components/GameBoard";
+import Link from "next/link";
 
 export default function GamePage() {
   return (

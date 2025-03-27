@@ -36,7 +36,7 @@ export const calculateGhostTarget = (
   ghostPosition: GridPosition,
   pacmanPosition: GridPosition,
   pacmanDirection: "up" | "down" | "left" | "right" | "none",
-  ghostMode: GhostMode
+  ghostMode: GhostMode,
 ): GridPosition => {
   // If in frightened mode, target is random
   if (ghostMode === "frightened") {
@@ -129,7 +129,7 @@ export const calculateGhostTarget = (
       // Clyde targets Pacman directly when far away, but targets scatter corner when close
       const distance = Math.sqrt(
         Math.pow(ghostPosition.col - pacmanPosition.col, 2) +
-          Math.pow(ghostPosition.row - pacmanPosition.row, 2)
+          Math.pow(ghostPosition.row - pacmanPosition.row, 2),
       );
 
       if (distance > 8) {
