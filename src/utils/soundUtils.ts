@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
 
 // Sound utility for managing game sounds
 export const useSounds = () => {
@@ -11,17 +11,17 @@ export const useSounds = () => {
   useEffect(() => {
     // Initialize sounds
     const sounds = {
-      start: new Audio('/sounds/playing-pac-man.mp3'),
-      munch: new Audio('/sounds/arcade-videogame-sound.mp3'),
-      death: new Audio('/sounds/arcade-videogame-sound.mp3'),
-      eatGhost: new Audio('/sounds/arcade-videogame-sound.mp3'),
-      powerPellet: new Audio('/sounds/arcade-videogame-sound.mp3'),
-      levelComplete: new Audio('/sounds/playing-pac-man.mp3'),
+      start: new Audio("/sounds/playing-pac-man.mp3"),
+      munch: new Audio("/sounds/arcade-videogame-sound.mp3"),
+      death: new Audio("/sounds/arcade-videogame-sound.mp3"),
+      eatGhost: new Audio("/sounds/arcade-videogame-sound.mp3"),
+      powerPellet: new Audio("/sounds/arcade-videogame-sound.mp3"),
+      levelComplete: new Audio("/sounds/playing-pac-man.mp3"),
     };
 
     // Set volume for each sound
-    Object.values(sounds).forEach(sound => {
-      sound.volume = 0.5;
+    Object.values(sounds).forEach((sound) => {
+      sound.volume = 0.1;
     });
 
     soundRefs.current = sounds;
@@ -29,7 +29,7 @@ export const useSounds = () => {
 
     return () => {
       // Cleanup sounds when component unmounts
-      Object.values(sounds).forEach(sound => {
+      Object.values(sounds).forEach((sound) => {
         sound.pause();
         sound.currentTime = 0;
       });
@@ -37,11 +37,15 @@ export const useSounds = () => {
   }, []);
 
   // Play a sound if sounds are enabled
-  const playSound = (soundName: string) => {
-    if (soundsLoaded && soundsEnabled && soundRefs.current[soundName]) {
+  const playSound = (soundName: string, forcePlay?: boolean) => {
+    if (
+      soundsLoaded &&
+      (soundsEnabled || (!soundsEnabled && forcePlay)) &&
+      soundRefs.current[soundName]
+    ) {
       // Reset the sound to the beginning if it's already playing
       soundRefs.current[soundName].currentTime = 0;
-      soundRefs.current[soundName].play().catch(error => {
+      soundRefs.current[soundName].play().catch((error) => {
         console.error(`Error playing sound ${soundName}:`, error);
       });
     }
@@ -57,7 +61,12 @@ export const useSounds = () => {
 
   // Toggle sounds on/off
   const toggleSounds = () => {
-    setSoundsEnabled(prev => !prev);
+    if (soundsEnabled) {
+      stopSound("start");
+    } else {
+      playSound("start", true);
+    }
+    setSoundsEnabled((prev) => !prev);
   };
 
   return {
@@ -65,6 +74,6 @@ export const useSounds = () => {
     stopSound,
     toggleSounds,
     soundsEnabled,
-    soundsLoaded
+    soundsLoaded,
   };
 };
