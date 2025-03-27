@@ -1492,7 +1492,9 @@ const GameBoard: React.FC = () => {
     <div className="relative flex flex-col items-center">
       <div className="mb-4 flex w-full justify-between items-center">
         <div className="text-white">
-          <span className="mr-4">LEVEL: {level}</span>
+          <span className="mr-4">
+            LEVEL: <span className="text-yellow-400">{level}</span>
+          </span>
         </div>
         <div className="text-white">
           <span className="mr-4">1UP</span>
@@ -1500,7 +1502,7 @@ const GameBoard: React.FC = () => {
         </div>
         <div className="text-white">
           <span className="mr-2">HIGH SCORE:</span>
-          <span>{highScore}</span>
+          <span className="text-yellow-400">{highScore}</span>
         </div>
       </div>
 
