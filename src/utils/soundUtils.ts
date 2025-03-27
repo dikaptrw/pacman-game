@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import useDevice from "./useDevice";
 
 // Sound utility for managing game sounds
 export const useSounds = () => {
+  const { isMobile } = useDevice();
+
   const [soundsLoaded, setSoundsLoaded] = useState(false);
   const [soundsEnabled, setSoundsEnabled] = useState(true);
   const soundRefs = useRef<{ [key: string]: HTMLAudioElement }>({});
@@ -39,6 +42,7 @@ export const useSounds = () => {
   // Play a sound if sounds are enabled
   const playSound = (soundName: string, forcePlay?: boolean) => {
     if (
+      !isMobile &&
       soundsLoaded &&
       (soundsEnabled || (!soundsEnabled && forcePlay)) &&
       soundRefs.current[soundName]

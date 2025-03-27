@@ -9,6 +9,7 @@ import {
   GhostMode,
 } from "@/utils/ghostUtils";
 import { useSounds } from "@/utils/soundUtils";
+import useDevice from "@/utils/useDevice";
 
 // Direction type for Pacman movement
 type Direction = "up" | "down" | "left" | "right" | "none";
@@ -62,6 +63,8 @@ interface TouchPosition {
 }
 
 const GameBoard: React.FC = () => {
+  const { isMobile } = useDevice();
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [maze, setMaze] = useState<Cell[][]>([]);
   const [pacman, setPacman] = useState<Pacman>({
@@ -1694,9 +1697,14 @@ const GameBoard: React.FC = () => {
       </div>
 
       <div className="mt-4 text-white text-sm flex justify-between w-full max-w-md">
-        <p>Controls: Arrow keys to move</p>
-        <p>Space: Start/Pause</p>
-        <p>M: {soundsEnabled ? "Mute" : "Unmute"}</p>
+        <p>
+          {isMobile
+            ? "Controls: Swipe screen to move"
+            : "Controls: Arrow keys to move"}
+        </p>
+        <p>{isMobile ? "Touch: Start the game" : "Space: Start/Pause"}</p>
+
+        {!isMobile && <p>M: {soundsEnabled ? "Mute" : "Unmute"}</p>}
       </div>
     </div>
   );
