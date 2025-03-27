@@ -8,8 +8,8 @@ import {
   GhostType,
   GhostMode,
 } from "@/utils/ghostUtils";
-import { useSounds } from "@/utils/soundUtils";
-import useDevice from "@/utils/useDevice";
+import { useSounds } from "@/hooks/useSounds";
+import useDevice from "@/hooks/useDevice";
 
 // Direction type for Pacman movement
 type Direction = "up" | "down" | "left" | "right" | "none";
