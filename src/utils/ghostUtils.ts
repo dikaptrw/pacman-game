@@ -1,7 +1,13 @@
 "use client";
 
 // Ghost type definitions
-export type GhostType = "blinky" | "pinky" | "inky" | "clyde";
+export type GhostType =
+  | "blinky"
+  | "pinky"
+  | "inky"
+  | "clyde"
+  | "teal"
+  | "white";
 export type GhostMode = "chase" | "scatter" | "frightened";
 
 // Grid position interface
@@ -17,6 +23,10 @@ export const getGhostColor = (type: GhostType, mode: GhostMode): string => {
   }
 
   switch (type) {
+    case "white":
+      return "#ffffff"; // White
+    case "teal":
+      return "#006A71"; // Teal
     case "blinky":
       return "#FF0000"; // Red
     case "pinky":
@@ -36,7 +46,7 @@ export const calculateGhostTarget = (
   ghostPosition: GridPosition,
   pacmanPosition: GridPosition,
   pacmanDirection: "up" | "down" | "left" | "right" | "none",
-  ghostMode: GhostMode,
+  ghostMode: GhostMode
 ): GridPosition => {
   // If in frightened mode, target is random
   if (ghostMode === "frightened") {
@@ -129,7 +139,7 @@ export const calculateGhostTarget = (
       // Clyde targets Pacman directly when far away, but targets scatter corner when close
       const distance = Math.sqrt(
         Math.pow(ghostPosition.col - pacmanPosition.col, 2) +
-          Math.pow(ghostPosition.row - pacmanPosition.row, 2),
+          Math.pow(ghostPosition.row - pacmanPosition.row, 2)
       );
 
       if (distance > 8) {

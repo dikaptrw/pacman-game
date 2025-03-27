@@ -180,6 +180,26 @@ const GameBoard: React.FC = () => {
           isMoving: false,
           moveProgress: 0,
         },
+        {
+          type: "teal",
+          position: { row: 29, col: 21 },
+          direction: "left",
+          mode: "scatter",
+          speed: GHOST_MOVE_TIME * 1.15,
+          targetPosition: { row: 31, col: 0 },
+          isMoving: false,
+          moveProgress: 0,
+        },
+        {
+          type: "white",
+          position: { row: 1, col: 9 },
+          direction: "down",
+          mode: "scatter",
+          speed: GHOST_MOVE_TIME * 1.15,
+          targetPosition: { row: 21, col: 0 },
+          isMoving: false,
+          moveProgress: 0,
+        },
       ];
 
       setMaze(initialMaze);
@@ -258,6 +278,26 @@ const GameBoard: React.FC = () => {
         mode: "scatter",
         speed: GHOST_MOVE_TIME * 1.15,
         targetPosition: { row: 31, col: 0 },
+        isMoving: false,
+        moveProgress: 0,
+      },
+      {
+        type: "teal",
+        position: { row: 29, col: 21 },
+        direction: "left",
+        mode: "scatter",
+        speed: GHOST_MOVE_TIME * 1.15,
+        targetPosition: { row: 31, col: 0 },
+        isMoving: false,
+        moveProgress: 0,
+      },
+      {
+        type: "white",
+        position: { row: 1, col: 9 },
+        direction: "down",
+        mode: "scatter",
+        speed: GHOST_MOVE_TIME * 1.15,
+        targetPosition: { row: 21, col: 0 },
         isMoving: false,
         moveProgress: 0,
       },
@@ -418,6 +458,26 @@ const GameBoard: React.FC = () => {
         mode: "scatter",
         speed: GHOST_MOVE_TIME * 1.15 * levelSpeedMultiplier,
         targetPosition: { row: 31, col: 0 },
+        isMoving: false,
+        moveProgress: 0,
+      },
+      {
+        type: "teal",
+        position: { row: 29, col: 21 },
+        direction: "left",
+        mode: "scatter",
+        speed: GHOST_MOVE_TIME * 1.15 * levelSpeedMultiplier,
+        targetPosition: { row: 31, col: 0 },
+        isMoving: false,
+        moveProgress: 0,
+      },
+      {
+        type: "white",
+        position: { row: 1, col: 9 },
+        direction: "down",
+        mode: "scatter",
+        speed: GHOST_MOVE_TIME * 1.15 * levelSpeedMultiplier,
+        targetPosition: { row: 21, col: 0 },
         isMoving: false,
         moveProgress: 0,
       },
@@ -617,6 +677,12 @@ const GameBoard: React.FC = () => {
                       break;
                     case "clyde":
                       baseSpeed = GHOST_MOVE_TIME * 1.15;
+                      break;
+                    case "teal":
+                      baseSpeed = GHOST_MOVE_TIME * 1.2;
+                      break;
+                    case "white":
+                      baseSpeed = GHOST_MOVE_TIME * 1.25;
                       break;
                   }
 
@@ -877,6 +943,8 @@ const GameBoard: React.FC = () => {
                       { row: 14, col: 13 }, // pinky
                       { row: 14, col: 11 }, // inky
                       { row: 14, col: 15 }, // clyde
+                      { row: 29, col: 21 }, // teal
+                      { row: 1, col: 9 }, // white
                     ];
 
                     return {
