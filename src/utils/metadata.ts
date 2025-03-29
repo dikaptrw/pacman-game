@@ -4,7 +4,7 @@ import { Twitter } from "next/dist/lib/metadata/types/twitter-types";
 
 export const type = "website";
 export const title = "Pacman - Play pacman game online for free";
-export const url = "https://snake.dikaptrw.com/";
+export const url = "https://pacman.dikaptrw.com/";
 export const description =
   "Play pacman game online for free. No sign up required.";
 export const imageUrl = `/seo.webp`;
