@@ -1,4 +1,4 @@
-# Snake Game
+# Pac-Man
 
 A modern take on the classic Pac-Man game built with Next.js. This project delivers a smooth and engaging gameplay experience with responsive design and intuitive controls.
 
