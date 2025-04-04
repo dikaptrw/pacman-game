@@ -77,7 +77,7 @@ export const useGhost = ({
       },
       {
         type: "sue",
-        position: { row: 13, col: 13 },
+        position: { row: 29, col: 21 },
         direction: "right",
         mode: "scatter",
         speed: ghostMoveTime * 1.2 * levelSpeedMultiplier,
