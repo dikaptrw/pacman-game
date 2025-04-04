@@ -27,6 +27,9 @@ export const useSounds = () => {
       sound.volume = 0.1;
     });
 
+    // Set specific volumes for certain sounds
+    sounds["munch"].volume = 0.03;
+
     soundRefs.current = sounds;
     setSoundsLoaded(true);
 
