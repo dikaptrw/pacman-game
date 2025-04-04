@@ -11,7 +11,6 @@ import {
   Cell,
 } from "@/types/game";
 import { isWalkable, getCell } from "@/utils/maze";
-import { useSounds } from "@/hooks/useSounds";
 
 interface UsePacmanProps {
   maze: Cell[][];
@@ -35,6 +34,7 @@ interface UsePacmanProps {
   frightenedGhostMoveTime: number;
   ghostMoveTime: number;
   powerModeDuration: number;
+  playSound: (soundName: string, forcePlay?: boolean) => void;
 }
 
 export const usePacman = ({
@@ -54,6 +54,7 @@ export const usePacman = ({
   frightenedGhostMoveTime,
   ghostMoveTime,
   powerModeDuration,
+  playSound,
 }: UsePacmanProps) => {
   const [pacman, setPacman] = useState<Pacman>({
     position: { row: 23, col: 13 }, // Starting position
@@ -65,8 +66,6 @@ export const usePacman = ({
     isMoving: false,
     moveProgress: 0,
   });
-
-  const { playSound } = useSounds();
 
   // Check if a move is valid in the specified direction
   const canMove = (position: GridPosition, direction: Direction): boolean => {

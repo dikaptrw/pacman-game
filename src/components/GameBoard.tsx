@@ -102,6 +102,7 @@ const GameBoard: React.FC = () => {
     setGhosts,
     setGhostsEaten,
     setMaze,
+    playSound,
     ghostsEaten,
     level,
     powerModeTimer,
