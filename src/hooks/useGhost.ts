@@ -8,8 +8,8 @@ import {
   Cell,
   GhostType,
 } from "@/types/game";
-import { isWalkable, getCell } from "@/utils/maze";
 import { calculateGhostTarget, getOppositeDirection } from "@/utils/ghost";
+import { canMove } from "@/utils";
 
 interface UseGhostProps {
   maze: Cell[][];
@@ -91,38 +91,6 @@ export const useGhost = ({
   const [ghosts, setGhosts] = useState<GridGhost[]>(createInitialGhosts());
   const [ghostsEaten, setGhostsEaten] = useState(0);
 
-  // Check if a move is valid in the specified direction
-  const canMove = (position: GridPosition, direction: Direction): boolean => {
-    if (direction === "none") return false;
-
-    // Calculate the target position based on direction
-    let targetRow = position.row;
-    let targetCol = position.col;
-
-    switch (direction) {
-      case "up":
-        targetRow -= 1;
-        break;
-      case "down":
-        targetRow += 1;
-        break;
-      case "left":
-        targetCol -= 1;
-        break;
-      case "right":
-        targetCol += 1;
-        break;
-    }
-
-    // Handle tunnel wrapping
-    if (targetCol < 0) targetCol = maze[0].length - 1;
-    if (targetCol >= maze[0].length) targetCol = 0;
-
-    // Check if the target position is walkable
-    const targetCell = getCell(maze, targetCol, targetRow);
-    return isWalkable(targetCell);
-  };
-
   // Move ghosts based on their behavior
   const moveGhosts = (deltaTime: number) => {
     setGhosts((prevGhosts) => {
@@ -143,25 +111,37 @@ export const useGhost = ({
           const oppositeDirection = getOppositeDirection(ghost.direction);
 
           // Check each direction
-          if (ghost.direction !== "down" && canMove(ghost.position, "up")) {
+          if (
+            ghost.direction !== "down" &&
+            canMove(ghost.position, "up", maze)
+          ) {
             possibleDirections.push("up");
           }
 
-          if (ghost.direction !== "up" && canMove(ghost.position, "down")) {
+          if (
+            ghost.direction !== "up" &&
+            canMove(ghost.position, "down", maze)
+          ) {
             possibleDirections.push("down");
           }
 
-          if (ghost.direction !== "right" && canMove(ghost.position, "left")) {
+          if (
+            ghost.direction !== "right" &&
+            canMove(ghost.position, "left", maze)
+          ) {
             possibleDirections.push("left");
           }
 
-          if (ghost.direction !== "left" && canMove(ghost.position, "right")) {
+          if (
+            ghost.direction !== "left" &&
+            canMove(ghost.position, "right", maze)
+          ) {
             possibleDirections.push("right");
           }
 
           // If no valid directions, try including the opposite direction
           if (possibleDirections.length === 0) {
-            if (canMove(ghost.position, oppositeDirection)) {
+            if (canMove(ghost.position, oppositeDirection, maze)) {
               possibleDirections.push(oppositeDirection);
             }
           }

@@ -10,7 +10,8 @@ import {
   TouchPosition,
   Cell,
 } from "@/types/game";
-import { isWalkable, getCell } from "@/utils/maze";
+import { getCell } from "@/utils/maze";
+import { canMove } from "@/utils";
 
 interface UsePacmanProps {
   maze: Cell[][];
@@ -69,38 +70,6 @@ export const usePacman = ({
     moveProgress: 0,
   });
 
-  // Check if a move is valid in the specified direction
-  const canMove = (position: GridPosition, direction: Direction): boolean => {
-    if (direction === "none") return false;
-
-    // Calculate the target position based on direction
-    let targetRow = position.row;
-    let targetCol = position.col;
-
-    switch (direction) {
-      case "up":
-        targetRow -= 1;
-        break;
-      case "down":
-        targetRow += 1;
-        break;
-      case "left":
-        targetCol -= 1;
-        break;
-      case "right":
-        targetCol += 1;
-        break;
-    }
-
-    // Handle tunnel wrapping
-    if (targetCol < 0) targetCol = maze[0].length - 1;
-    if (targetCol >= maze[0].length) targetCol = 0;
-
-    // Check if the target position is walkable
-    const targetCell = getCell(maze, targetCol, targetRow);
-    return isWalkable(targetCell);
-  };
-
   // Move Pacman based on current direction
   const movePacman = (deltaTime: number) => {
     setPacman((prev) => {
@@ -109,7 +78,7 @@ export const usePacman = ({
         // First try to move in the next direction if it's set
         if (
           prev.nextDirection !== "none" &&
-          canMove(prev.position, prev.nextDirection)
+          canMove(prev.position, prev.nextDirection, maze)
         ) {
           return {
             ...prev,
@@ -121,7 +90,7 @@ export const usePacman = ({
         // Otherwise try to continue in the current direction
         else if (
           prev.direction !== "none" &&
-          canMove(prev.position, prev.direction)
+          canMove(prev.position, prev.direction, maze)
         ) {
           return {
             ...prev,
