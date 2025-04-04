@@ -122,9 +122,8 @@ const GameBoard: React.FC = () => {
         setGameState("playing");
         playSound("start");
         startGhostModeCycling(toggleGhostMode);
-        // }
-        // else if (gameState === "playing") {
-        //   setGameState("paused");
+      } else if (gameState === "playing") {
+        setGameState("paused");
       } else if (gameState === "game-over") {
         resetGame();
         resetPacman();

@@ -22,6 +22,8 @@ export const useTouchControls = ({
     null
   );
   const [activeTouchId, setActiveTouchId] = useState<number | null>(null);
+  const [touchStartTime, setTouchStartTime] = useState<number | null>(null);
+  const [hasMoved, setHasMoved] = useState(false);
 
   // Detect if the device is mobile
   useEffect(() => {
@@ -60,9 +62,8 @@ export const useTouchControls = ({
         x: touch.clientX,
         y: touch.clientY,
       });
-
-      // Trigger game action (start/pause)
-      onGameAction();
+      setTouchStartTime(Date.now());
+      setHasMoved(false);
     }
   };
 
@@ -81,6 +82,16 @@ export const useTouchControls = ({
             x: touch.clientX,
             y: touch.clientY,
           });
+
+          // Check if we've moved beyond the minimum drag distance
+          if (touchStartPos) {
+            const deltaX = Math.abs(touch.clientX - touchStartPos.x);
+            const deltaY = Math.abs(touch.clientY - touchStartPos.y);
+            if (deltaX > 5 || deltaY > 5) {
+              // Small threshold to detect movement
+              setHasMoved(true);
+            }
+          }
 
           // Process movement based on drag direction
           processTouchMovement();
@@ -102,9 +113,19 @@ export const useTouchControls = ({
     }
 
     if (activeEnded) {
+      // Check if this was a quick tap (not a hold or drag)
+      const isQuickTap =
+        touchStartTime && !hasMoved && Date.now() - touchStartTime < 300; // 300ms threshold for quick tap
+
+      if (isQuickTap) {
+        onGameAction();
+      }
+
       setActiveTouchId(null);
       setTouchStartPos(null);
       setCurrentTouchPos(null);
+      setTouchStartTime(null);
+      setHasMoved(false);
     }
   };
 
