@@ -1,20 +1,4 @@
-"use client";
-
-// Ghost type definitions
-export type GhostType =
-  | "blinky"
-  | "pinky"
-  | "inky"
-  | "clyde"
-  | "teal"
-  | "white";
-export type GhostMode = "chase" | "scatter" | "frightened";
-
-// Grid position interface
-interface GridPosition {
-  row: number;
-  col: number;
-}
+import { Direction, GridPosition, GhostType, GhostMode } from "@/types/game";
 
 // Get ghost color based on type and mode
 export const getGhostColor = (type: GhostType, mode: GhostMode): string => {
@@ -23,18 +7,16 @@ export const getGhostColor = (type: GhostType, mode: GhostMode): string => {
   }
 
   switch (type) {
-    case "white":
-      return "#ffffff"; // White
-    case "teal":
-      return "#006A71"; // Teal
     case "blinky":
-      return "#FF0000"; // Red
+      return "#E91716"; // Red
     case "pinky":
-      return "#FFC0CB"; // Pink
+      return "#FF82D6"; // Pink
     case "inky":
-      return "#00FFFF"; // Cyan
+      return "#65D2E7"; // Cyan
     case "clyde":
-      return "#FFA500"; // Orange
+      return "#FF7918"; // Orange
+    case "sue":
+      return "#8B17C6"; // Purple
     default:
       return "#FFFFFF"; // White (fallback)
   }
@@ -45,7 +27,7 @@ export const calculateGhostTarget = (
   ghostType: GhostType,
   ghostPosition: GridPosition,
   pacmanPosition: GridPosition,
-  pacmanDirection: "up" | "down" | "left" | "right" | "none",
+  pacmanDirection: Direction,
   ghostMode: GhostMode
 ): GridPosition => {
   // If in frightened mode, target is random
@@ -67,6 +49,8 @@ export const calculateGhostTarget = (
         return { row: 31, col: 27 }; // Bottom-right
       case "clyde":
         return { row: 31, col: 0 }; // Bottom-left
+      case "sue":
+        return { row: 15, col: 0 }; // Center-bottom
       default:
         return { row: 0, col: 0 };
     }
@@ -150,7 +134,38 @@ export const calculateGhostTarget = (
         return { row: 31, col: 0 };
       }
 
+    case "sue":
+      // Sue is like Clyde in some versions: chases Pacman if far, retreats to scatter if close
+      const sueDistance = Math.sqrt(
+        Math.pow(ghostPosition.col - pacmanPosition.col, 2) +
+          Math.pow(ghostPosition.row - pacmanPosition.row, 2)
+      );
+
+      if (sueDistance > 5) {
+        // Slightly smaller threshold than Clyde's
+        return { row: pacmanPosition.row, col: pacmanPosition.col };
+      } else {
+        // Sue's scatter corner (you can customize this)
+        return { row: 0, col: 27 };
+      }
+
     default:
       return { row: pacmanPosition.row, col: pacmanPosition.col };
+  }
+};
+
+// Get the opposite direction
+export const getOppositeDirection = (direction: Direction): Direction => {
+  switch (direction) {
+    case "up":
+      return "down";
+    case "down":
+      return "up";
+    case "left":
+      return "right";
+    case "right":
+      return "left";
+    default:
+      return "none";
   }
 };
