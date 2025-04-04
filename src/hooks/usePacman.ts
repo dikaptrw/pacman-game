@@ -35,6 +35,7 @@ interface UsePacmanProps {
   ghostMoveTime: number;
   powerModeDuration: number;
   playSound: (soundName: string, forcePlay?: boolean) => void;
+  stopSound: (soundName: string) => void;
 }
 
 export const usePacman = ({
@@ -55,6 +56,7 @@ export const usePacman = ({
   ghostMoveTime,
   powerModeDuration,
   playSound,
+  stopSound,
 }: UsePacmanProps) => {
   const [pacman, setPacman] = useState<Pacman>({
     position: { row: 23, col: 13 }, // Starting position
@@ -220,6 +222,7 @@ export const usePacman = ({
             // Set timer to end power mode
             const timer = setTimeout(() => {
               setPowerMode(false);
+              stopSound("powerPellet");
 
               // Restore ghosts to normal mode with level-appropriate speed
               const levelSpeedMultiplier = 1 - level * 0.05;

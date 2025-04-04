@@ -14,21 +14,21 @@ export const useSounds = () => {
   useEffect(() => {
     // Initialize sounds
     const sounds = {
-      start: new Audio("/sounds/playing-pac-man.mp3"),
-      munch: new Audio("/sounds/arcade-videogame-sound.mp3"),
-      death: new Audio("/sounds/arcade-videogame-sound.mp3"),
-      eatGhost: new Audio("/sounds/arcade-videogame-sound.mp3"),
-      powerPellet: new Audio("/sounds/arcade-videogame-sound.mp3"),
-      levelComplete: new Audio("/sounds/playing-pac-man.mp3"),
+      start: new Audio("/sounds/start.mp3"),
+      munch: new Audio("/sounds/munch.mp3"),
+      death: new Audio("/sounds/death.mp3"),
+      eatGhost: new Audio("/sounds/eatGhost.mp3"),
+      powerPellet: new Audio("/sounds/powerPellet.mp3"),
+      levelComplete: new Audio("/sounds/levelComplete.mp3"),
     };
 
     // Set volume for each sound
     Object.values(sounds).forEach((sound) => {
-      sound.volume = 0.1;
+      sound.volume = 0.01;
     });
 
     // Set specific volumes for certain sounds
-    sounds["munch"].volume = 0.03;
+    sounds["start"].volume = 0.1;
 
     soundRefs.current = sounds;
     setSoundsLoaded(true);

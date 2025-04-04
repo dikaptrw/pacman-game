@@ -38,7 +38,7 @@ const GameBoard: React.FC = () => {
   const [highScore, setHighScore] = React.useState<number>(0);
 
   // Use custom hooks
-  const { soundsEnabled, playSound, toggleSounds } = useSounds();
+  const { soundsEnabled, playSound, stopSound, toggleSounds } = useSounds();
 
   const {
     gameState,
@@ -103,6 +103,7 @@ const GameBoard: React.FC = () => {
     setGhostsEaten,
     setMaze,
     playSound,
+    stopSound,
     ghostsEaten,
     level,
     powerModeTimer,
@@ -382,38 +383,8 @@ const GameBoard: React.FC = () => {
     lastTimeRef,
   ]);
 
-  // Handle game state changes
-  // const handleStartPause = () => {
-  //   if (gameState === "ready" || gameState === "paused") {
-  //     setGameState("playing");
-  //     playSound("start");
-  //     startGhostModeCycling(toggleGhostMode);
-  //   } else if (gameState === "playing") {
-  //     setGameState("paused");
-  //   } else if (gameState === "game-over") {
-  //     resetGame();
-  //     resetPacman();
-  //     resetGhosts();
-  //     setMaze(createMaze());
-  //     setDotsRemaining(countDots(createMaze()));
-  //     setScore(0);
-  //   }
-  // };
-
   return (
     <div className="relative flex flex-col items-center" ref={gameBoardRef}>
-      {/* <GameControls
-        gameState={gameState}
-        score={score}
-        highScore={highScore}
-        level={level}
-        lives={pacman.lives}
-        isMobileDevice={isMobileDevice}
-        soundsEnabled={soundsEnabled}
-        onStartPause={handleStartPause}
-        onToggleSound={toggleSounds}
-      /> */}
-
       <div className="mb-4 flex w-full justify-between items-center">
         <div className="text-white">
           <span className="mr-4">
