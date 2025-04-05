@@ -3,19 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { GameState, VisualEffect, GridPosition } from "@/types/game";
 
-interface UseGameStateProps {
-  dotsRemaining: number;
-  pacmanLives: number;
-  score: number;
-  highScore: number;
-}
-
-export const useGameState = ({
-  dotsRemaining,
-  pacmanLives,
-  score,
-  highScore,
-}: UseGameStateProps) => {
+export const useGameState = () => {
   const [gameState, setGameState] = useState<GameState>("ready");
   const [level, setLevel] = useState(1);
   const [powerMode, setPowerMode] = useState(false);
@@ -49,26 +37,6 @@ export const useGameState = ({
       setVisualEffects((prev) => prev.filter((effect) => effect !== newEffect));
     }, newEffect.duration);
   };
-
-  // Check if level is complete (all dots eaten)
-  useEffect(() => {
-    if (dotsRemaining === 0 && gameState === "playing") {
-      // Level complete
-      setGameState("win");
-    }
-  }, [dotsRemaining, gameState]);
-
-  // Check for game over
-  useEffect(() => {
-    if (pacmanLives <= 0 && gameState !== "game-over") {
-      setGameState("game-over");
-
-      // Update high score if needed
-      if (score > highScore) {
-        localStorage.setItem("pacmanHighScore", score.toString());
-      }
-    }
-  }, [pacmanLives, gameState, score, highScore]);
 
   // Clean up timers on unmount
   useEffect(() => {

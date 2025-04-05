@@ -37,6 +37,7 @@ interface UsePacmanProps {
   powerModeDuration: number;
   playSound: (soundName: string, forcePlay?: boolean) => void;
   stopSound: (soundName: string) => void;
+  pacmanLives: number;
 }
 
 export const usePacman = ({
@@ -58,6 +59,7 @@ export const usePacman = ({
   powerModeDuration,
   playSound,
   stopSound,
+  pacmanLives = 3,
 }: UsePacmanProps) => {
   const [pacman, setPacman] = useState<Pacman>({
     position: { row: 23, col: 13 }, // Starting position
@@ -65,7 +67,7 @@ export const usePacman = ({
     nextDirection: "none",
     mouthOpen: true,
     mouthAngle: 0.2,
-    lives: 3,
+    lives: pacmanLives,
     isMoving: false,
     moveProgress: 0,
   });
@@ -320,7 +322,7 @@ export const usePacman = ({
       nextDirection: "none",
       mouthOpen: true,
       mouthAngle: 0.2,
-      lives: 3,
+      lives: pacmanLives,
       isMoving: false,
       moveProgress: 0,
     });

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useCallback } from "react";
+import React, { useRef, useEffect, useCallback, useMemo } from "react";
 import { GameSettings, Cell } from "@/types/game";
 import { createMaze, countDots } from "@/utils/maze";
 import { usePacman } from "@/hooks/usePacman";
@@ -10,6 +10,16 @@ import { useSounds } from "@/hooks/useSounds";
 import { useTouchControls } from "@/hooks/useTouchControls";
 import GameRenderer from "@/components/GameRenderer";
 import useDevice from "@/hooks/useDevice";
+import GamePlayer from "./GamePlayer";
+import {
+  collection,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+} from "@firebase/firestore";
+import db from "@/utils/firestore";
+import { ENV } from "@/constants";
 
 // Game settings
 const gameSettings: GameSettings = {
@@ -19,6 +29,9 @@ const gameSettings: GameSettings = {
   frightenedGhostMoveTime: 400, // ms per cell
   powerModeDuration: 8000,
   minDragDistance: 10,
+  highScoreStorageKey: "pacmanHighScore",
+  highScorePlayerStorageKey: "pacmanHighScorePlayer",
+  pacmanLives: 3,
 };
 
 const GameBoard: React.FC = () => {
@@ -36,6 +49,14 @@ const GameBoard: React.FC = () => {
   // Initialize score
   const [score, setScore] = React.useState<number>(0);
   const [highScore, setHighScore] = React.useState<number>(0);
+  const [highScorePlayer, setHighScorePlayer] = React.useState<string>("");
+  const [playerName, setPlayerName] = React.useState<string>("");
+  const collectionRef = useMemo(() => {
+    return collection(db, "dikaptrw-profile", ENV, "games");
+  }, []);
+  const docRef = useMemo(() => {
+    return doc(collectionRef, process.env.NEXT_PUBLIC_PAC_MAN_GAME_DOC_ID);
+  }, [collectionRef]);
 
   // Use custom hooks
   const { soundsEnabled, playSound, stopSound, toggleSounds } = useSounds();
@@ -55,12 +76,7 @@ const GameBoard: React.FC = () => {
     startGhostModeCycling,
     nextLevel,
     resetGame,
-  } = useGameState({
-    dotsRemaining,
-    pacmanLives: 3,
-    score,
-    highScore,
-  });
+  } = useGameState();
 
   const {
     ghosts,
@@ -111,6 +127,7 @@ const GameBoard: React.FC = () => {
     frightenedGhostMoveTime: gameSettings.frightenedGhostMoveTime,
     ghostMoveTime: gameSettings.ghostMoveTime,
     powerModeDuration: gameSettings.powerModeDuration,
+    pacmanLives: gameSettings.pacmanLives,
   });
 
   const { isMobileDevice, setupTouchListeners } = useTouchControls({
@@ -119,20 +136,7 @@ const GameBoard: React.FC = () => {
       setPacman((prev) => ({ ...prev, nextDirection: direction }));
     },
     onGameAction: () => {
-      if (gameState === "ready" || gameState === "paused") {
-        setGameState("playing");
-        playSound("start");
-        startGhostModeCycling(toggleGhostMode);
-      } else if (gameState === "playing") {
-        setGameState("paused");
-      } else if (gameState === "game-over") {
-        resetGame();
-        resetPacman();
-        resetGhosts();
-        setMaze(createMaze());
-        setDotsRemaining(countDots(createMaze()));
-        setScore(0);
-      }
+      handleGameControls();
     },
   });
 
@@ -143,25 +147,45 @@ const GameBoard: React.FC = () => {
     }
   }, [setupTouchListeners]);
 
+  // Handle game start
+  const handleStartGame = useCallback(() => {
+    setGameState("playing");
+    playSound("start");
+    startGhostModeCycling(toggleGhostMode);
+  }, [playSound, setGameState, startGhostModeCycling, toggleGhostMode]);
+
+  // Handle game reset
+  const handleResetGame = useCallback(() => {
+    resetGame();
+    resetPacman();
+    resetGhosts();
+    setMaze(createMaze());
+    setDotsRemaining(countDots(createMaze()));
+    setScore(0);
+  }, [resetGame, resetPacman, resetGhosts]);
+
+  // Handle game pause
+  const handlePauseGame = useCallback(() => {
+    setGameState("paused");
+  }, [setGameState]);
+
+  // Handle game controls
+  const handleGameControls = useCallback(() => {
+    if (gameState === "ready" || gameState === "paused") {
+      handleStartGame();
+    } else if (gameState === "playing") {
+      handlePauseGame();
+    } else if (gameState === "game-over") {
+      handleResetGame();
+    }
+  }, [gameState, handlePauseGame, handleResetGame, handleStartGame]);
+
   // Handle keyboard input
   useEffect(() => {
     const handleKeyboardInput = (e: KeyboardEvent) => {
       // Game controls
       if (e.key === " " || e.key === "Enter") {
-        if (gameState === "ready" || gameState === "paused") {
-          setGameState("playing");
-          playSound("start");
-          startGhostModeCycling(toggleGhostMode);
-        } else if (gameState === "playing") {
-          setGameState("paused");
-        } else if (gameState === "game-over") {
-          resetGame();
-          resetPacman();
-          resetGhosts();
-          setMaze(createMaze());
-          setDotsRemaining(countDots(createMaze()));
-          setScore(0);
-        }
+        handleGameControls();
         return;
       }
 
@@ -190,7 +214,34 @@ const GameBoard: React.FC = () => {
     startGhostModeCycling,
     toggleGhostMode,
     toggleSounds,
+    handleGameControls,
   ]);
+
+  // Handle high score update on firestore
+  const updateHighScoreFirestore = useCallback(
+    ({
+      highScore,
+      highScorePlayer,
+    }: {
+      highScore: number;
+      highScorePlayer: string;
+    }) => {
+      getDoc(docRef).then((res) => {
+        if (res.exists()) {
+          updateDoc(docRef, {
+            highScore: Math.floor(highScore),
+            playerName: highScorePlayer,
+          });
+        } else {
+          setDoc(docRef, {
+            highScore: Math.floor(highScore),
+            playerName: highScorePlayer,
+          });
+        }
+      });
+    },
+    [docRef]
+  );
 
   // Check for collisions between Pacman and ghosts
   const checkGhostCollisions = useCallback(() => {
@@ -255,8 +306,24 @@ const GameBoard: React.FC = () => {
 
             // Update high score if needed
             if (score > highScore) {
+              if (process.env.NEXT_PUBLIC_HIGH_SCORE_MODE === "firestore") {
+                updateHighScoreFirestore({
+                  highScore: score,
+                  highScorePlayer: playerName,
+                });
+              } else {
+                // Save high score to local storage
+                localStorage.setItem(
+                  gameSettings.highScoreStorageKey,
+                  score.toString()
+                );
+                localStorage.setItem(
+                  gameSettings.highScorePlayerStorageKey,
+                  playerName.toString()
+                );
+              }
               setHighScore(score);
-              localStorage.setItem("pacmanHighScore", score.toString());
+              setHighScorePlayer(playerName);
             }
           } else {
             // Reset positions but continue game
@@ -287,6 +354,8 @@ const GameBoard: React.FC = () => {
     setGameState,
     setGhosts,
     setGhostsEaten,
+    playerName,
+    updateHighScoreFirestore,
   ]);
 
   // Helper function to get the opposite direction
@@ -333,10 +402,27 @@ const GameBoard: React.FC = () => {
 
   // Load high score from localStorage on mount
   useEffect(() => {
-    const savedHighScore = localStorage.getItem("pacmanHighScore");
-    if (savedHighScore) {
-      setHighScore(parseInt(savedHighScore, 10));
+    if (process.env.NEXT_PUBLIC_HIGH_SCORE_MODE === "firestore") {
+      getDoc(docRef).then((res) => {
+        const data = res.data();
+
+        if (data) {
+          setHighScore(data.highScore);
+          setHighScorePlayer(data.playerName);
+        }
+      });
+    } else {
+      const storedHighScore = localStorage.getItem(
+        gameSettings.highScoreStorageKey
+      );
+      const storedHighScorePlayer = localStorage.getItem(
+        gameSettings.highScorePlayerStorageKey
+      );
+
+      setHighScore(storedHighScore ? parseInt(storedHighScore, 10) : highScore);
+      setHighScorePlayer(storedHighScorePlayer || highScorePlayer);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Game loop
@@ -398,6 +484,9 @@ const GameBoard: React.FC = () => {
         <div className="text-white">
           <span className="mr-2">HIGH SCORE:</span>
           <span className="text-yellow-400">{highScore}</span>
+          {highScorePlayer && (
+            <span className="text-xs pl-1">({highScorePlayer})</span>
+          )}
         </div>
       </div>
 
@@ -423,16 +512,25 @@ const GameBoard: React.FC = () => {
         soundsEnabled={soundsEnabled}
       />
 
-      <div className="mt-4 flex">
-        {Array.from({ length: pacman.lives }).map((_, i) => (
-          <div
-            key={i}
-            className="w-4 h-4 bg-yellow-400 rounded-full mx-1"
-          ></div>
-        ))}
+      <div className="flex items-center justify-between w-full mt-4">
+        <GamePlayer
+          handleStartGame={handleStartGame}
+          playerName={playerName}
+          setPlayerName={setPlayerName}
+          isPlaying={gameState === "playing"}
+        />
+
+        <div className="flex">
+          {Array.from({ length: pacman.lives }).map((_, i) => (
+            <div
+              key={i}
+              className="w-4 h-4 bg-yellow-400 rounded-full mx-1"
+            ></div>
+          ))}
+        </div>
       </div>
 
-      <div className="mt-4 text-white text-sm flex justify-between w-full max-w-md">
+      <div className="mt-3.5 text-white text-sm flex justify-between w-full max-w-md">
         <p>
           {isMobile
             ? "Controls: Swipe screen to move"

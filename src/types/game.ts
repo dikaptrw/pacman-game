@@ -69,4 +69,7 @@ export interface GameSettings {
   frightenedGhostMoveTime: number;
   powerModeDuration: number;
   minDragDistance: number;
+  highScoreStorageKey: string;
+  highScorePlayerStorageKey: string;
+  pacmanLives: number;
 }
