@@ -15,6 +15,7 @@ import {
   collection,
   doc,
   getDoc,
+  onSnapshot,
   setDoc,
   updateDoc,
 } from "@firebase/firestore";
@@ -411,6 +412,15 @@ const GameBoard: React.FC = () => {
           setHighScorePlayer(data.playerName);
         }
       });
+
+      // Listen for changes in the Firestore document
+      const unsubscribe = onSnapshot(docRef, (data) => {
+        setHighScore(data.data()?.highScore || highScore);
+        setHighScorePlayer(data.data()?.playerName || highScorePlayer);
+      });
+
+      // Cleanup the listener when the component unmounts
+      return () => unsubscribe();
     } else {
       const storedHighScore = localStorage.getItem(
         gameSettings.highScoreStorageKey
