@@ -142,8 +142,8 @@ const GameBoard: React.FC = () => {
 
   // Set up touch event listeners
   useEffect(() => {
-    if (gameBoardRef.current) {
-      return setupTouchListeners(gameBoardRef.current);
+    if (canvasRef.current) {
+      return setupTouchListeners(canvasRef.current);
     }
   }, [setupTouchListeners]);
 
