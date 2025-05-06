@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.0] - 2025-05-06
+
+### Changed
+
+- Changed the root route (`/`) to point directly to the game page.
+- Removed the `/game` route to simplify navigation.
+
 ## [2.1.0] - 2025-04-05
 
 ### Added
