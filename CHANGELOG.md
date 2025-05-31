@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.1] - 2025-05-31
+
+### Added
+
+- Introduced Volta configuration in `package.json` to manage Node.js and Yarn versions consistently.
+
+### Changed
+
+- Improved keyboard event handling by adding `e.preventDefault()` in `handleKeyDown`.
+- Updated Yarn version to `4.9.1` for toolchain consistency.
+
 ## [2.2.0] - 2025-05-06
 
 ### Changed
