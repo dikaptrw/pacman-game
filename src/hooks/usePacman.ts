@@ -268,6 +268,8 @@ export const usePacman = ({
         setPacman((prev) => ({ ...prev, nextDirection: "right" }));
         break;
     }
+
+    e.preventDefault();
   };
 
   // Process touch movement based on drag direction

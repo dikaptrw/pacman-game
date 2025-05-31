@@ -198,6 +198,8 @@ const GameBoard: React.FC = () => {
 
       // Movement controls
       handleKeyDown(e);
+
+      e.preventDefault();
     };
 
     window.addEventListener("keydown", handleKeyboardInput);
